@@ -7,13 +7,26 @@
  * web apps that only need codes, names, currencies, languages, geo and flags.
  */
 import { countriesLite } from './generated/countries.lite';
-import { createCountryApi, emojiFlag } from './core';
+import { createCountryApi, emojiFlag, selectFrom } from './core';
+import type { SelectOptions } from './core';
 import type { LiteCountry } from './types';
 
-const api = createCountryApi<LiteCountry>(countriesLite);
+/** Every ISO 3166-1 entry (250), slimmed; includes territories and dependencies. */
+export const allCountries: LiteCountry[] = countriesLite;
 
-// Slim dataset (exported as `countries` for parity with the main entry)
-export { countriesLite, countriesLite as countries, emojiFlag };
+/** Default slim dataset: the 195 independent/sovereign states (`independent === true`). */
+export const countries: LiteCountry[] = countriesLite.filter((c) => c.independent === true);
+
+const api = createCountryApi<LiteCountry>(countries);
+
+/** Build a custom country list (scope + include/exclude) from the full ISO set. */
+export function selectCountries(options?: SelectOptions): LiteCountry[] {
+  return selectFrom(allCountries, options);
+}
+
+// Slim dataset + dataset-independent helpers
+export { emojiFlag, createCountryApi, selectFrom };
+export type { SelectOptions };
 
 // Helper functions (typed to the slim LiteCountry record)
 export const {

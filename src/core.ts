@@ -2,6 +2,45 @@ import type { CountryLike } from './types';
 
 export type SortDirection = 'asc' | 'desc';
 
+export interface SelectOptions {
+  /** `'independent'` (default) keeps only sovereign states; `'all'` keeps every ISO entry. */
+  scope?: 'independent' | 'all';
+  /** Codes (cca2/cca3, case-insensitive) to add back regardless of scope. */
+  include?: string[];
+  /** Codes (cca2/cca3, case-insensitive) to remove. */
+  exclude?: string[];
+}
+
+/**
+ * Build a country list from a full dataset using uniform, field-based rules:
+ * a scope (independent states vs every ISO entry) plus optional `include`/
+ * `exclude` code lists the consumer controls. Order is preserved and entries
+ * are de-duplicated.
+ */
+export function selectFrom<T extends CountryLike>(
+  all: T[],
+  options: SelectOptions = {},
+): T[] {
+  const { scope = 'independent', include = [], exclude = [] } = options;
+  const norm = (s: string): string => s.trim().toUpperCase();
+  const includeSet = new Set(include.map(norm));
+  const excludeSet = new Set(exclude.map(norm));
+
+  const seen = new Set<T>();
+  const out: T[] = [];
+  for (const c of all) {
+    const codes = [norm(c.cca2), norm(c.cca3)];
+    if (excludeSet.has(codes[0]!) || excludeSet.has(codes[1]!)) continue;
+    const inScope = scope === 'all' || c.independent;
+    const forced = includeSet.has(codes[0]!) || includeSet.has(codes[1]!);
+    if ((inScope || forced) && !seen.has(c)) {
+      seen.add(c);
+      out.push(c);
+    }
+  }
+  return out;
+}
+
 export interface SearchOptions {
   /** Maximum number of results to return. Default: all matches. */
   limit?: number;

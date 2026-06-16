@@ -7,14 +7,30 @@
  * For a much smaller payload (no translations / native names / image URLs),
  * import from `@minka1902/country-data/lite`.
  */
-import { countries, provenance } from './generated';
-import { createCountryApi, emojiFlag } from './core';
+import { countries as allRecords, provenance } from './generated';
+import { createCountryApi, emojiFlag, selectFrom } from './core';
+import type { SelectOptions } from './core';
 import type { Country } from './types';
+
+/** Every ISO 3166-1 entry (250), including territories and dependencies. */
+export const allCountries: Country[] = allRecords;
+
+/**
+ * Default dataset: the 195 independent/sovereign states (`independent === true`).
+ * Use {@link allCountries} or {@link selectCountries} for the full ISO set.
+ */
+export const countries: Country[] = allRecords.filter((c) => c.independent === true);
 
 const api = createCountryApi<Country>(countries);
 
+/** Build a custom country list (scope + include/exclude) from the full ISO set. */
+export function selectCountries(options?: SelectOptions): Country[] {
+  return selectFrom(allCountries, options);
+}
+
 // Raw data + provenance + dataset-independent helpers
-export { countries, provenance, emojiFlag };
+export { provenance, emojiFlag, createCountryApi, selectFrom };
+export type { SelectOptions };
 
 // Helper functions (typed to the full Country record)
 export const {
