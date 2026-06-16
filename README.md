@@ -115,7 +115,13 @@ All return `Country | undefined`.
 ### Search, filter & sort
 - `searchByName(query, { limit?, threshold? })` — fuzzy, relevance-ranked.
 - `filterByRegion` / `filterBySubregion` / `filterByContinent` / `filterByCurrency` / `filterByLanguage`.
+- `findByCallingCode(code)` — countries on a phone code, e.g. `"972"` → Israel, `"1"` → US/Canada.
+- `findByTimezone(tz)` — countries on a UTC-offset timezone, e.g. `"UTC+01:00"`. *(full entry only)*
 - `sortByName` / `sortByPopulation` / `sortByArea` — `(list?, dir?)`, return new arrays.
+
+### Relations & names
+- `getBorders(country)` — resolve a country's `borders` to full `Country[]` (within the current scope).
+- `getName(country, lang)` — localized common name from `translations`, e.g. `getName('DE','fra')` → `"Allemagne"`. *(full entry only)*
 
 ### Conversions
 - `alpha2ToAlpha3`, `alpha3ToAlpha2`, `alpha2ToNumeric`, `numericToAlpha2`, `alpha3ToNumeric`, `numericToAlpha3`.
@@ -123,6 +129,21 @@ All return `Country | undefined`.
 
 ### Geo
 - `distanceBetween(a, b, unit?)` — great-circle distance (`'km'` default or `'mi'`); accepts alpha-2 codes or `Country` objects.
+- `nearestCountry(lat, lng)` — the closest country to a coordinate.
+- `countriesWithinRadius(lat, lng, radiusKm)` — countries within a radius, nearest first.
+
+## Subdivisions (ISO 3166-2)
+
+States, provinces and regions are available from a separate subpath so they stay
+out of the main bundle (~41 KB gzipped, 3,800+ subdivisions):
+
+```ts
+import { getSubdivisions, getSubdivision, searchSubdivisions } from '@minka1902/country-data/subdivisions';
+
+getSubdivisions('US');            // → all US states/territories (Subdivision[])
+getSubdivision('US-CA');          // → { code: 'US-CA', name: 'California', countryCode: 'US' }
+searchSubdivisions('Californ');   // → name substring match
+```
 
 ### Types
 The `Country` interface and all nested types (`CountryName`, `Currencies`, `Idd`, `Flags`, `Car`, `PostalCode`, …) plus the code unions (`Cca2`, `Cca3`, `CurrencyCode`, `Region`, …) are exported.
@@ -142,6 +163,7 @@ npm test           # validate integrity
 
 - **Source code:** MIT — see [`LICENSE`](./LICENSE).
 - **Country data:** Open Database License (ODbL) v1.0 — see [`LICENSE-DATA`](./LICENSE-DATA) and [`NOTICE`](./NOTICE). The data is derived from [REST Countries](https://gitlab.com/restcountries/restcountries) / [mledoze/countries](https://github.com/mledoze/countries).
+- **Subdivision data** (`/subdivisions`): MIT — derived from [olahol/iso-3166-2.json](https://github.com/olahol/iso-3166-2.json).
 - **Flag & coat-of-arms images/emoji** referenced by URL are **not** covered by the ODbL and remain subject to their own sources' terms.
 
 If you redistribute or adapt the bundled database, the ODbL requires you to provide attribution and to offer any adapted database under the ODbL.

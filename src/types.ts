@@ -172,6 +172,8 @@ export interface CountryLike {
   continents: string[];
   currencies: Currencies;
   languages: Languages;
+  idd: Idd;
+  borders: string[];
   latlng: LatLng;
   population: number;
   area: number;
@@ -206,5 +208,18 @@ export interface LiteCountry {
   /** Emoji flag, e.g. `🇩🇪`. */
   flag: string;
   population: number;
+}
+
+/**
+ * An ISO 3166-2 country subdivision (state, province, region, etc.), exposed via
+ * the `/subdivisions` subpath.
+ */
+export interface Subdivision {
+  /** ISO 3166-2 code, e.g. `"US-CA"`. */
+  code: string;
+  /** Subdivision name, e.g. `"California"`. */
+  name: string;
+  /** Parent country alpha-2 code, e.g. `"US"`. */
+  countryCode: string;
 }
 

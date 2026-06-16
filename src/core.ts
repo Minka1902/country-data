@@ -92,6 +92,21 @@ function toRadians(deg: number): number {
   return (deg * Math.PI) / 180;
 }
 
+/** Great-circle distance in kilometres between two lat/lng points (haversine). */
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+/** Keep only ASCII digits from a calling-code-ish string (drops `+`, spaces, dashes). */
+function digits(value: string): string {
+  return String(value).replace(/\D/g, '');
+}
+
 /**
  * Build a Unicode emoji flag from an alpha-2 code, e.g. `"ZA"` → `🇿🇦`.
  * Dataset-independent. Returns `undefined` if the input is not two ASCII letters.
@@ -291,17 +306,65 @@ export function createCountryApi<T extends CountryLike>(countries: T[]) {
     const ca = typeof a === 'string' ? getByCca2(a) : a;
     const cb = typeof b === 'string' ? getByCca2(b) : b;
     if (!ca || !cb) return undefined;
-    const [lat1, lon1] = ca.latlng;
-    const [lat2, lon2] = cb.latlng;
-    const dLat = toRadians(lat2 - lat1);
-    const dLon = toRadians(lon2 - lon1);
-    const h =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRadians(lat1)) *
-        Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) ** 2;
-    const km = 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(h)));
+    const km = distanceKm(ca.latlng[0], ca.latlng[1], cb.latlng[0], cb.latlng[1]);
     return unit === 'mi' ? km / KM_PER_MILE : km;
+  }
+
+  /**
+   * Resolve a country's `borders` codes to full records, within the current
+   * scope. Neighbours outside the scope (e.g. territories under the default
+   * independent-only view) are omitted; use an all-scope api to include them.
+   */
+  function getBorders(country: string | T): T[] {
+    const c = typeof country === 'string' ? getCountry(country) : country;
+    if (!c) return [];
+    const out: T[] = [];
+    for (const code of c.borders) {
+      const neighbour = getByCca3(code);
+      if (neighbour) out.push(neighbour);
+    }
+    return out;
+  }
+
+  /**
+   * Countries that use a telephone calling code, e.g. `"972"` → Israel, `"1"`
+   * → the North American Numbering Plan members. Matches the `idd` root, or
+   * root + a suffix, on digits only.
+   */
+  function findByCallingCode(code: string): T[] {
+    const q = digits(code);
+    if (!q) return [];
+    return countries.filter((c) => {
+      const root = digits(c.idd.root);
+      if (!root) return false;
+      if (root === q) return true;
+      return c.idd.suffixes.some((s) => root + digits(s) === q);
+    });
+  }
+
+  /** The single closest country to a coordinate by great-circle distance. */
+  function nearestCountry(lat: number, lng: number): T | undefined {
+    let best: T | undefined;
+    let bestKm = Infinity;
+    for (const c of countries) {
+      const km = distanceKm(lat, lng, c.latlng[0], c.latlng[1]);
+      if (km < bestKm) {
+        bestKm = km;
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  /** Countries whose representative coordinate is within `radiusKm`, nearest first. */
+  function countriesWithinRadius(lat: number, lng: number, radiusKm: number): T[] {
+    const scored: Array<{ c: T; km: number }> = [];
+    for (const c of countries) {
+      const km = distanceKm(lat, lng, c.latlng[0], c.latlng[1]);
+      if (km <= radiusKm) scored.push({ c, km });
+    }
+    scored.sort((a, b) => a.km - b.km);
+    return scored.map((s) => s.c);
   }
 
   return {
@@ -327,5 +390,9 @@ export function createCountryApi<T extends CountryLike>(countries: T[]) {
     alpha3ToNumeric,
     numericToAlpha3,
     distanceBetween,
+    getBorders,
+    findByCallingCode,
+    nearestCountry,
+    countriesWithinRadius,
   };
 }
