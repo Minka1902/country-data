@@ -154,3 +154,56 @@ export interface Country {
   /** IANA timezone identifiers / UTC offsets. */
   timezones: string[];
 }
+
+/**
+ * Structural minimum the helper functions read. Both {@link Country} and
+ * {@link LiteCountry} satisfy it, so the same helpers work over either dataset.
+ */
+export interface CountryLike {
+  name: { common: string; official: string; nativeName?: NativeName };
+  cca2: string;
+  cca3: string;
+  ccn3: string;
+  cioc: string;
+  altSpellings: string[];
+  region: string;
+  subregion: string;
+  continents: string[];
+  currencies: Currencies;
+  languages: Languages;
+  latlng: LatLng;
+  population: number;
+  area: number;
+}
+
+/**
+ * A slimmed country record exposed via the `/lite` subpath. Keeps the fields
+ * needed for dropdowns, lookups, filtering, conversions and distance, and drops
+ * the heavy ones (`translations`, `name.nativeName`, `flags`, `coatOfArms`,
+ * `maps`, `demonyms`, `gini`, `postalCode`, `car`, `timezones`, …).
+ */
+export interface LiteCountry {
+  name: { common: string; official: string };
+  cca2: Cca2;
+  ccn3: string;
+  cca3: Cca3;
+  cioc: string;
+  independent: boolean;
+  unMember: boolean;
+  currencies: Currencies;
+  idd: Idd;
+  capital: string[];
+  altSpellings: string[];
+  region: Region;
+  subregion: string;
+  continents: Continent[];
+  languages: Languages;
+  latlng: LatLng;
+  landlocked: boolean;
+  borders: Cca3[];
+  area: number;
+  /** Emoji flag, e.g. `🇩🇪`. */
+  flag: string;
+  population: number;
+}
+

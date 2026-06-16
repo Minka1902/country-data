@@ -1,22 +1,21 @@
 /**
- * @minka1902/country-data
+ * @minka1902/country-data/lite
  *
- * Comprehensive, fully-typed data for every country (REST Countries v3.1),
- * with lookup, search, filter, conversion and geo helpers. Zero runtime deps.
- *
- * For a much smaller payload (no translations / native names / image URLs),
- * import from `@minka1902/country-data/lite`.
+ * The same API as the main entry, backed by a slimmed dataset that drops the
+ * heavy fields (translations, native names, demonyms, flag/coat-of-arms image
+ * URLs, maps, gini, postal codes, car, timezones). Ideal for bundle-sensitive
+ * web apps that only need codes, names, currencies, languages, geo and flags.
  */
-import { countries, provenance } from './generated';
+import { countriesLite } from './generated/countries.lite';
 import { createCountryApi, emojiFlag } from './core';
-import type { Country } from './types';
+import type { LiteCountry } from './types';
 
-const api = createCountryApi<Country>(countries);
+const api = createCountryApi<LiteCountry>(countriesLite);
 
-// Raw data + provenance + dataset-independent helpers
-export { countries, provenance, emojiFlag };
+// Slim dataset (exported as `countries` for parity with the main entry)
+export { countriesLite, countriesLite as countries, emojiFlag };
 
-// Helper functions (typed to the full Country record)
+// Helper functions (typed to the slim LiteCountry record)
 export const {
   getByCca2,
   getByCca3,
@@ -71,27 +70,11 @@ export type {
 
 // Domain types
 export type {
-  Country,
+  LiteCountry,
   CountryLike,
-  CountryName,
-  LocalizedName,
-  NativeName,
   Currency,
   Currencies,
   Idd,
-  Demonym,
-  Demonyms,
-  Translation,
-  Translations,
-  Maps,
-  Car,
-  Flags,
-  CoatOfArms,
-  CapitalInfo,
-  PostalCode,
   Languages,
-  Gini,
   LatLng,
-  CountryStatus,
-  StartOfWeek,
 } from './types';

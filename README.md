@@ -18,6 +18,8 @@ Built on the [REST Countries v3.1](https://gitlab.com/restcountries/restcountrie
 npm install @minka1902/country-data
 ```
 
+> **Bundle-sensitive?** Import from [`@minka1902/country-data/lite`](#lite-build) for the same API at ~30 KB gzipped instead of ~172 KB.
+
 ## Quick start
 
 ```ts
@@ -41,6 +43,28 @@ emojiFlag('ZA');                 // → '🇿🇦'
 distanceBetween('FR', 'DE');     // → ~758 (km)
 countries.length;                // → 250
 ```
+
+## Lite build
+
+For bundle-sensitive apps (especially the browser), import from the `/lite`
+subpath. It exposes the **same helper API** over a slimmed dataset:
+
+```ts
+import { getByCca2, searchByName, distanceBetween, countries } from '@minka1902/country-data/lite';
+```
+
+| Build | Records | Gzipped | Per-country fields |
+| ----- | ------- | ------- | ------------------ |
+| `@minka1902/country-data`      | 250 | ~172 KB | all (~30) |
+| `@minka1902/country-data/lite` | 250 | **~30 KB** | essentials (21) |
+
+The lite record (`LiteCountry`) keeps codes, common/official name, flag emoji,
+currencies, languages, calling codes, capital, region/subregion/continent,
+coordinates, borders, area and population. It **drops** the heavy fields:
+`translations`, `name.nativeName`, `flags`/`coatOfArms` image URLs, `maps`,
+`demonyms`, `gini`, `postalCode`, `car`, `timezones`, `startOfWeek`, `tld`,
+`fifa`, `status`, `capitalInfo`. (Name search still works on common/official/alt
+spellings, just not native names.)
 
 ## API
 
