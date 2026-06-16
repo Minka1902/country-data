@@ -1,10 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import * as lite from '../src/lite';
-import { countries as fullCountries } from '../src/index';
+import { countries as fullCountries, allCountries as fullAll } from '../src/index';
 
 describe('lite entry', () => {
-  it('has the same number of countries as the full dataset', () => {
+  it('mirrors the full dataset sizes (default and all)', () => {
     expect(lite.countries.length).toBe(fullCountries.length);
+    expect(lite.countries.length).toBe(195);
+    expect(lite.allCountries.length).toBe(fullAll.length);
+    expect(lite.allCountries.length).toBe(250);
   });
 
   it('drops the heavy fields', () => {

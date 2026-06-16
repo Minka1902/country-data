@@ -165,6 +165,7 @@ export interface CountryLike {
   cca3: string;
   ccn3: string;
   cioc: string;
+  independent: boolean;
   altSpellings: string[];
   region: string;
   subregion: string;

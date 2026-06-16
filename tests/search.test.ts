@@ -37,7 +37,7 @@ describe('filters', () => {
   });
 
   it('filters by continent', () => {
-    expect(filterByContinent('Antarctica').length).toBeGreaterThan(0);
+    expect(filterByContinent('Oceania').length).toBeGreaterThan(0);
     expect(filterByContinent('africa').every((c) => c.continents.includes('Africa'))).toBe(true);
   });
 

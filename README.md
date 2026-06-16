@@ -41,7 +41,7 @@ filterByCurrency('EUR');         // → all eurozone countries
 alpha2ToAlpha3('US');            // → 'USA'
 emojiFlag('ZA');                 // → '🇿🇦'
 distanceBetween('FR', 'DE');     // → ~758 (km)
-countries.length;                // → 250
+countries.length;                // → 195 (independent states; see Scope below)
 ```
 
 ## Lite build
@@ -53,10 +53,10 @@ subpath. It exposes the **same helper API** over a slimmed dataset:
 import { getByCca2, searchByName, distanceBetween, countries } from '@minka1902/country-data/lite';
 ```
 
-| Build | Records | Gzipped | Per-country fields |
-| ----- | ------- | ------- | ------------------ |
-| `@minka1902/country-data`      | 250 | ~172 KB | all (~30) |
-| `@minka1902/country-data/lite` | 250 | **~30 KB** | essentials (21) |
+| Build | Records (default / all) | Gzipped | Per-country fields |
+| ----- | ----------------------- | ------- | ------------------ |
+| `@minka1902/country-data`      | 195 / 250 | ~172 KB | all (~30) |
+| `@minka1902/country-data/lite` | 195 / 250 | **~30 KB** | essentials (21) |
 
 The lite record (`LiteCountry`) keeps codes, common/official name, flag emoji,
 currencies, languages, calling codes, capital, region/subregion/continent,
@@ -68,8 +68,37 @@ spellings, just not native names.)
 
 ## API
 
+### Scope: independent states vs. all ISO entries
+
+The dataset holds 250 ISO 3166-1 entries, but only **195 are independent
+sovereign states**; the rest are territories and dependencies (Greenland, Puerto
+Rico, Hong Kong, Western Sahara, etc.). By default the package — and all the
+helper functions — operate on the **195 independent states**:
+
+```ts
+import { countries, allCountries, selectCountries, createCountryApi } from '@minka1902/country-data';
+
+countries.length;                          // 195 (independent states, default)
+allCountries.length;                       // 250 (every ISO 3166-1 entry)
+
+// Build a custom list with uniform rules, then wire helpers over it:
+const list = selectCountries({ scope: 'all', exclude: ['XK'] });   // all, minus Kosovo
+const api = createCountryApi(list);
+api.getByCca3('PRI');                       // Puerto Rico, now in scope
+```
+
+`selectCountries({ scope, include, exclude })`:
+- `scope`: `'independent'` (default) or `'all'`.
+- `include` / `exclude`: arrays of alpha-2 or alpha-3 codes (case-insensitive).
+
+These are uniform, field-based rules (`independent`, plus your own code lists) —
+nothing is hand-picked in the data itself.
+
 ### Data exports
-- `countries: Country[]` — the full dataset.
+- `countries: Country[]` — default list: the 195 independent states.
+- `allCountries: Country[]` — every ISO 3166-1 entry (250).
+- `selectCountries(options)` — custom scope/include/exclude selection.
+- `createCountryApi(list)` — wire the full helper suite over any country list.
 - `provenance` — source URL, pinned commit and generation timestamp.
 - `cca2Codes`, `cca3Codes`, `ccn3Codes`, `ciocCodes`, `currencyCodes`, `languageCodes`, `regions`, `subregions`, `continents` — `readonly` arrays of every value.
 
