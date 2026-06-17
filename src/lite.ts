@@ -52,6 +52,10 @@ export const {
   alpha3ToNumeric,
   numericToAlpha3,
   distanceBetween,
+  getBorders,
+  findByCallingCode,
+  nearestCountry,
+  countriesWithinRadius,
 } = api;
 
 export type { SortDirection, SearchOptions } from './core';

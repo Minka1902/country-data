@@ -56,7 +56,29 @@ export const {
   alpha3ToNumeric,
   numericToAlpha3,
   distanceBetween,
+  getBorders,
+  findByCallingCode,
+  nearestCountry,
+  countriesWithinRadius,
 } = api;
+
+/** Countries observing a UTC-offset timezone, e.g. `"UTC+01:00"` (case-insensitive). */
+export function findByTimezone(tz: string): Country[] {
+  const q = String(tz).trim().toLowerCase();
+  if (!q) return [];
+  return countries.filter((c) => c.timezones.some((t) => t.toLowerCase() === q));
+}
+
+/**
+ * Localized common name of a country in a given language (ISO 639-3, e.g.
+ * `"fra"`), falling back to the English common name. Accepts a code or a
+ * `Country`. Returns `undefined` only if the country can't be resolved.
+ */
+export function getName(country: string | Country, lang: string): string | undefined {
+  const c = typeof country === 'string' ? getCountry(country) : country;
+  if (!c) return undefined;
+  return c.translations[String(lang).trim().toLowerCase()]?.common ?? c.name.common;
+}
 
 export type { SortDirection, SearchOptions } from './core';
 
