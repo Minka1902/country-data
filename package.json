@@ -18,6 +18,11 @@
       "import": "./dist/lite.js",
       "require": "./dist/lite.cjs"
     },
+    "./subdivisions": {
+      "types": "./dist/subdivisions.d.ts",
+      "import": "./dist/subdivisions.js",
+      "require": "./dist/subdivisions.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [

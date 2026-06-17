@@ -14,6 +14,10 @@ at https://opendatacommons.org/licenses/odbl/1-0/.
 Any rights in individual contents of the database are licensed under the
 Database Contents License: https://opendatacommons.org/licenses/dbcl/1-0/.
 
+ISO 3166-2 subdivision data (the `/subdivisions` subpath) is derived from the
+olahol/iso-3166-2.json project (https://github.com/olahol/iso-3166-2.json),
+licensed under the MIT License.
+
 Flag images, flag emoji and coat-of-arms images referenced by URL in the data
 are NOT covered by the ODbL. They are sourced from third parties (e.g.
 flagcdn.com, mainfacts.com) and remain subject to their own terms and to the

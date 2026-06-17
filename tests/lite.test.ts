@@ -47,4 +47,11 @@ describe('lite entry', () => {
     expect(d).toBeGreaterThan(400);
     expect(d).toBeLessThan(1200);
   });
+
+  it('exposes the generic richer helpers', () => {
+    expect(lite.getBorders('FRA').map((c) => c.cca3)).toContain('ESP');
+    expect(lite.findByCallingCode('972').map((c) => c.cca3)).toContain('ISR');
+    expect(lite.nearestCountry(46, 2)?.cca3).toBe('FRA');
+    expect(lite.countriesWithinRadius(50.85, 4.35, 400).map((c) => c.cca3)).toContain('BEL');
+  });
 });
